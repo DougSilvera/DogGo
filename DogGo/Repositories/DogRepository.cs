@@ -41,7 +41,7 @@ namespace DogGo.Repositories
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                                 OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
-                                Breed = reader.GetString(reader.GetOrdinal("Breed")) ,
+                                Breed = reader.GetString(reader.GetOrdinal("Breed")),
                                 Owner = new Owner
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("OwnerId")),
@@ -52,7 +52,7 @@ namespace DogGo.Repositories
                             {
                                 dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
                             }
-                            if (reader.IsDBNull (reader.GetOrdinal("ImageUrl")) ==false)
+                            if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
                             {
                                 dog.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
                             }
@@ -63,21 +63,112 @@ namespace DogGo.Repositories
                 }
             }
         }
-       public Dog GetDogById(int id)
+        public Dog GetDogById(int id)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT d.Id, d.[Name], d.OwnerId, d.Breed, d.Notes, d.ImageUrl, o.[Name] as OwnerName FROM Dog d 
+                                        LEFT JOIN Owner o ON d.OwnerId = o.Id WHERE d.Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Dog dog = new Dog
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                                Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                                Owner = new Owner
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                                    Name = reader.GetString(reader.GetOrdinal("OwnerName"))
+                                }
+                            };
+                            if (reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
+                            {
+                                dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
+                            }
+                            if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                            {
+                                dog.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                            }
+                            return dog;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
         }
         public void AddDog(Dog dog)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
+                                        OUTPUT INSERTED.ID
+                                        VALUES (@name, @ownerId, @breed, @notes, @imageUrl);";
+                    cmd.Parameters.AddWithValue("@name", dog.Name);
+                    cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
+                    cmd.Parameters.AddWithValue("@breed", dog.Breed);
+                    cmd.Parameters.AddWithValue("@notes", dog.Notes == null ? DBNull.Value : dog.Notes);
+                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl == null ? "https://jdsupra-html-images.s3-us-west-1.amazonaws.com/db4b8dbc-814c-4fb6-9e42-bfd5393fdace-doge-e1633357157847.png" : dog.ImageUrl);
+
+                    int id = (int)cmd.ExecuteScalar();
+
+                    dog.Id = id;
+                }
+            }
         }
         public void UpdateDog(Dog dog)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                              UPDATE Dog 
+                              SET 
+                                    [Name] = @name, 
+                                    OwnerId = @ownerId, 
+                                    Breed = @breed, 
+                                    Notes = @notes, 
+                                    ImageUrl = @imageUrl 
+                              WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@name", dog.Name);
+                    cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
+                    cmd.Parameters.AddWithValue("@breed", dog.Breed);
+                    cmd.Parameters.AddWithValue("@notes", dog.Notes == null ? DBNull.Value : dog.Notes);
+                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl == null ? "https://jdsupra-html-images.s3-us-west-1.amazonaws.com/db4b8dbc-814c-4fb6-9e42-bfd5393fdace-doge-e1633357157847.png" : dog.ImageUrl);
+                    cmd.Parameters.AddWithValue("@id", dog.Id);
+
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
         }
         public void DeleteDog(int dogId)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = Connection)
+            {
+                connection.Open();
+                using (SqlCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM Dog WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", dogId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
     }
