@@ -435,3 +435,6 @@ C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Dogs\Detail
 C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Dogs\Create.cshtml.g.cs
 C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Dogs\Delete.cshtml.g.cs
 C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Dogs\Edit.cshtml.g.cs
+C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Walkers\Create.cshtml.g.cs
+C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Walkers\Delete.cshtml.g.cs
+C:\Users\short\workspace\c#\DogGo\DogGo\obj\Debug\net5.0\Razor\Views\Walkers\Edit.cshtml.g.cs
