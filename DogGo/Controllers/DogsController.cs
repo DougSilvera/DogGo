@@ -32,7 +32,13 @@ namespace DogGo.Controllers
         // GET: DogController/Details/5
         public ActionResult Details(int id)
         {
+            
             Dog dog = _dogRepo.GetDogById(id);
+            int ownerId = GetCurrentUserId();
+            if (dog.OwnerId != ownerId)
+            {
+                return NotFound();
+            }
 
             if (dog == null)
             {
