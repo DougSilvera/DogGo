@@ -4,6 +4,8 @@ using DogGo.Repositories;
 using DogGo.Models;
 using System.Collections.Generic;
 using DogGo.Models.ViewModels;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DogGo.Controllers
 {
@@ -17,9 +19,13 @@ namespace DogGo.Controllers
             _ownerRepository = ownerRepository;
         }
         // GET: DogController
+        [Authorize]
         public ActionResult Index()
         {
-            List<Dog> dogs = _dogRepo.GetAllDogs();
+            int ownerId = GetCurrentUserId();
+
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(ownerId);
+
             return View(dogs);
         }
 
@@ -36,6 +42,7 @@ namespace DogGo.Controllers
         }
 
         // GET: DogController/Create
+        [Authorize]
         public ActionResult Create()
         {
             List<Owner> owners = _ownerRepository.GetAllOwners();
@@ -55,6 +62,7 @@ namespace DogGo.Controllers
         {
             try
             {
+                dog.OwnerId = GetCurrentUserId();
                 _dogRepo.AddDog(dog);
                 return RedirectToAction(nameof(Index));
             }
@@ -69,6 +77,11 @@ namespace DogGo.Controllers
         {
             Dog dog = _dogRepo.GetDogById(id);
             List<Owner> owners = _ownerRepository.GetAllOwners();
+            int ownerId = GetCurrentUserId();
+            if (dog.OwnerId != ownerId)
+            {
+                return NotFound();
+            }
 
             DogFormViewModel model = new DogFormViewModel
             {
@@ -101,7 +114,13 @@ namespace DogGo.Controllers
         // GET: DogController/Delete/5
         public ActionResult Delete(int id)
         {
+
             Dog dog = _dogRepo.GetDogById(id);
+            int ownerId = GetCurrentUserId();
+            if (dog.OwnerId != ownerId)
+            {
+                return NotFound();
+            }
             return View(dog);
         }
 
@@ -119,6 +138,11 @@ namespace DogGo.Controllers
             {
                 return View(dog);
             }
+        }
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }
