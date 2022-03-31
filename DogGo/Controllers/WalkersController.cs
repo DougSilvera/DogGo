@@ -12,12 +12,14 @@ namespace DogGo.Controllers
     {
         private readonly IWalkerRepository _walkerRepo;
         private readonly IWalksRepository _walksRepository;
+        private readonly INeighborhoodRepository _neighborhoodRepository;
 
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
-        public WalkersController(IWalkerRepository walkerRepository, IWalksRepository walksRepository)
+        public WalkersController(IWalkerRepository walkerRepository, IWalksRepository walksRepository, INeighborhoodRepository neighborhoodRepository)
         {
             _walkerRepo = walkerRepository;
             _walksRepository = walksRepository;
+            _neighborhoodRepository = neighborhoodRepository;
         }
         // GET: Walkers
         public ActionResult Index()
@@ -49,7 +51,14 @@ namespace DogGo.Controllers
         // GET: WalkersController/Create
         public ActionResult Create()
         {
-            return View();
+            List<Neighborhood> neighborhoods = _neighborhoodRepository.GetAll();
+
+            WalkerFormViewModel vm = new WalkerFormViewModel()
+            {
+                Walker = new Walker(),
+                Neighborhoods = neighborhoods
+            };
+            return View(vm);
         }
 
         // POST: WalkersController/Create
@@ -72,12 +81,15 @@ namespace DogGo.Controllers
         public ActionResult Edit(int id)
         {
             Walker walker = _walkerRepo.GetWalkerById(id);
-
+            List<Neighborhood> neighborhoods = _neighborhoodRepository.GetAll();
             if (walker == null)
+            { return NotFound(); }
+            WalkerFormViewModel vm = new WalkerFormViewModel()
             {
-                return NotFound();
-            }
-            return View(walker);
+                Walker = walker,
+                Neighborhoods = neighborhoods
+            };
+            return View(vm);
         }
 
         // POST: WalkersController/Edit/5
@@ -100,7 +112,13 @@ namespace DogGo.Controllers
         public ActionResult Delete(int id)
         {
             Walker walker = _walkerRepo.GetWalkerById(id);
-            return View(walker);
+            Neighborhood neighborhood = _neighborhoodRepository.GetNeighborhoodById(walker.NeighborhoodId);
+            WalkerDeleteViewModel vm = new WalkerDeleteViewModel()
+            {
+                Neighborhood = neighborhood,
+                Walker = walker
+            };
+            return View(vm);
         }
 
         // POST: WalkersController/Delete/5

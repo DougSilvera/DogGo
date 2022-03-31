@@ -13,16 +13,17 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                <label>Id</label>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                <label>Name</label>
+
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NeighborhoodId)
+                <label>Neighborhood</label>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
+                <label>Picture</label>
             </th>
             <th></th>
         </tr>
@@ -38,7 +39,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NeighborhoodId)
+                    @Html.DisplayFor(modelItem => item.Neighborhood.Name)
                 </td>
                 <td>
                     <img src="@item.ImageUrl" alt="avatar" />
