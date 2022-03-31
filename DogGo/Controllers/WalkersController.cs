@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using DogGo.Models;
 using DogGo.Interfaces;
 using DogGo.Models.ViewModels;
+using System;
+using System.Security.Claims;
 
 namespace DogGo.Controllers
 {
@@ -13,20 +15,42 @@ namespace DogGo.Controllers
         private readonly IWalkerRepository _walkerRepo;
         private readonly IWalksRepository _walksRepository;
         private readonly INeighborhoodRepository _neighborhoodRepository;
+        private readonly IOwnerRepository _ownerRepository;
 
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
-        public WalkersController(IWalkerRepository walkerRepository, IWalksRepository walksRepository, INeighborhoodRepository neighborhoodRepository)
+        public WalkersController(IWalkerRepository walkerRepository, IWalksRepository walksRepository, INeighborhoodRepository neighborhoodRepository, IOwnerRepository ownerRepository)
         {
             _walkerRepo = walkerRepository;
             _walksRepository = walksRepository;
             _neighborhoodRepository = neighborhoodRepository;
+            _ownerRepository = ownerRepository;
         }
         // GET: Walkers
         public ActionResult Index()
         {
-            List<Walker> walkers = _walkerRepo.GetAllWalkers();
+            int ownerId = GetCurrentUserId();
+            Owner owner = _ownerRepository.GetOwnerById(ownerId);
+            if (ownerId == 0)
+            {
+                List<Walker> walkers = _walkerRepo.GetAllWalkers();
+                return View(walkers);
 
-            return View(walkers);
+            } else
+            {
+                List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
+                return View(walkers);
+            }
+
+        }
+
+        private int GetCurrentUserId()
+        {
+            {
+                string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (id == null)
+                { id = "0"; }
+                return int.Parse(id);
+            }
         }
 
         // GET: Walkers/Details/5
