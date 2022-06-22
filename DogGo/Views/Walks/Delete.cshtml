@@ -1,0 +1,56 @@
+﻿@model DogGo.Models.ViewModels.WalkDeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Select
+            </th>
+            <th>
+                Id
+            </th>
+            <th>
+                Duration
+            </th>
+            <th>
+                Walker
+            </th>
+            <th>
+                Dog
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Walks) {
+        <tr>
+              <td>
+                 <input id="@item.Id" name="Select"  type="checkbox" />
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.WalkDuration)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Owner.Name)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Dog.Name)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+

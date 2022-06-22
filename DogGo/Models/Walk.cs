@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 namespace DogGo.Models
 {
@@ -7,8 +8,11 @@ namespace DogGo.Models
         public int Id { get; set; }
         [DisplayFormat(DataFormatString = "{0:MMM dd, yyyy}")]
         public DateTime Date { get; set; }
+        [DisplayName("Duration (Min)")]
         public int Duration { get; set; }
+        [DisplayName("Walker")]
         public int WalkerId { get; set; }
+        [DisplayName("Dog")]
         public int DogId { get; set; }
         public Walker Walker { get; set; }
         public Dog Dog { get; set; }
@@ -23,5 +27,6 @@ namespace DogGo.Models
                 return $"{totalHours} hrs {minutes} min";
             }
         }
+        
     }
 }
